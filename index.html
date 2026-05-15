@@ -186,30 +186,21 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 <!-- MSAL SDK Microsoft -->
 <script>
 (function(){
-  var cdns = [
+  var cdns=[
     'https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js',
     'https://unpkg.com/@azure/msal-browser@2.38.3/lib/msal-browser.min.js'
   ];
-  var idx = 0;
+  var idx=0;
   function tryLoad(){
-    if(idx >= cdns.length){
-      var dot = document.getElementById('sync-dot');
-      var lbl = document.getElementById('sync-label');
-      if(dot) dot.className = 'sync-dot error';
-      if(lbl) lbl.textContent = 'SDK MSAL non chargé — vérifiez votre connexion';
-      return;
+    if(idx>=cdns.length){
+      var d=document.getElementById('sync-dot'),l=document.getElementById('sync-label');
+      if(d)d.className='sync-dot error';if(l)l.textContent='SDK MSAL non chargé';return;
     }
-    var s = document.createElement('script');
-    s.src = cdns[idx++];
-    s.onload = function(){ if(typeof initMSAL === 'function') initMSAL(); };
-    s.onerror = function(){ tryLoad(); };
-    document.head.appendChild(s);
+    var s=document.createElement('script');s.src=cdns[idx++];
+    s.onload=function(){if(typeof window.initMSAL==='function')window.initMSAL();};
+    s.onerror=function(){tryLoad();};document.head.appendChild(s);
   }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', tryLoad);
-  } else {
-    tryLoad();
-  }
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',tryLoad):tryLoad();
 })();
 </script>
 </head>
@@ -906,7 +897,16 @@ function save(){
   if(msAccount) saveToOneDrive();
 }
 
+// Exposition globale des fonctions (requis pour les onclick HTML)
+window.msLogin=msLogin; window.msLogout=msLogout; window.manualSync=manualSync;
+window.initMSAL=initMSAL; window.openNew=openNew; window.openEdit=openEdit;
+window.closeM=closeM; window.overlayClick=overlayClick; window.saveE=saveE;
+window.delE=delE; window.selT=selT; window.onPaidChange=onPaidChange;
+window.toggleP=toggleP; window.toggleM=toggleM; window.switchTab=switchTab;
+window.renderRecap=renderRecap; window.togglePaid=togglePaid; window.exportPDF=exportPDF;
+
 renderAll();
+
 </script>
 </body>
 </html>
