@@ -184,7 +184,34 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </style>
 
 <!-- MSAL SDK Microsoft -->
-<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<script>
+(function(){
+  var cdns = [
+    'https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js',
+    'https://unpkg.com/@azure/msal-browser@2.38.3/lib/msal-browser.min.js'
+  ];
+  var idx = 0;
+  function tryLoad(){
+    if(idx >= cdns.length){
+      var dot = document.getElementById('sync-dot');
+      var lbl = document.getElementById('sync-label');
+      if(dot) dot.className = 'sync-dot error';
+      if(lbl) lbl.textContent = 'SDK MSAL non chargé — vérifiez votre connexion';
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = cdns[idx++];
+    s.onload = function(){ if(typeof initMSAL === 'function') initMSAL(); };
+    s.onerror = function(){ tryLoad(); };
+    document.head.appendChild(s);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', tryLoad);
+  } else {
+    tryLoad();
+  }
+})();
+</script>
 </head>
 <body>
 
@@ -723,7 +750,7 @@ const MSAL_CONFIG = {
   auth: {
     clientId: '1c24df42-5127-4df6-8edd-b8b6c9668550',
     authority: 'https://login.microsoftonline.com/sis2bcorsica.onmicrosoft.com',
-    redirectUri: window.location.origin + window.location.pathname.split('?')[0]
+    redirectUri: 'https://neoloop.github.io/sic-planning/'
   },
   cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
 };
@@ -879,7 +906,6 @@ function save(){
   if(msAccount) saveToOneDrive();
 }
 
-initMSAL();
 renderAll();
 </script>
 </body>
