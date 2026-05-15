@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning Astreinte SIC 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface2:#f0f3f8;
+  --border:#e3e8f0;--border2:#c8d3e3;
+  --text:#1a2035;--muted:#6b7a99;--hint:#a0acc0;
+  --accent:#2563eb;
+  --p0:#2563eb;--p1:#16a34a;--p2:#ea580c;
+  --p3:#7c3aed;--p4:#db2777;--p5:#b45309;
+  --r:10px;--r2:6px;
+  --green:#16a34a;--greenl:#f0fdf4;--greenb:#bbf7d0;
+  --orange:#ea580c;--orangel:#fff7ed;--orangeb:#fed7aa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;border-radius:9px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo h1{font-size:14px;font-weight:600}
+.logo p{font-size:11px;color:var(--muted)}
+.hbtns{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--r2);
+  border:1px solid var(--border2);background:var(--surface);color:var(--text);
+  font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .13s}
+.btn:hover{background:var(--surface2)}
+.btn-blue{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-blue:hover{background:#1d4ed8}
+.btn-red{background:#dc2626;border-color:#dc2626;color:#fff}
+.btn-red:hover{background:#b91c1c}
+.btn-danger{background:#fff5f5;border-color:#fca5a5;color:#dc2626}
+.btn-danger:hover{background:#fee2e2}
+/* TABS */
+.tabs{background:var(--surface);border-bottom:2px solid var(--border);padding:0 24px;display:flex}
+.tab{padding:12px 20px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;
+  margin-bottom:-2px;color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text);background:var(--surface2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tabpanel{display:none}.tabpanel.active{display:block}
+.legbar{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:7px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.legbar-label{font-size:11px;color:var(--muted);font-weight:500}
+.leg-list{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.leg-item{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;
+  border:1px solid var(--border);cursor:pointer;transition:opacity .13s;font-size:11px}
+.leg-item.off{opacity:.28}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.sep{width:1px;height:16px;background:var(--border)}
+.expbar{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:7px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.expbar-label{font-size:11px;color:var(--muted);font-weight:500}
+.mbtns{display:flex;gap:4px;flex-wrap:wrap}
+.mbtn{padding:3px 9px;border-radius:20px;border:1px solid var(--border2);
+  background:var(--surface2);font-size:11px;cursor:pointer;color:var(--muted)}
+.mbtn.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;padding:14px 24px}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 13px}
+.slbl{font-size:10px;color:var(--muted);margin-bottom:2px;display:flex;align-items:center;gap:4px}
+.sdot{width:7px;height:7px;border-radius:2px}
+.sval{font-size:20px;font-weight:600;font-family:'DM Mono',monospace}
+.ssub{font-size:9px;color:var(--hint);margin-top:1px}
+.cal{padding:0 24px 32px}
+.ygrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1100px){.ygrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.ygrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.ygrid{grid-template-columns:1fr}}
+.mcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.mhdr{display:flex;justify-content:space-between;align-items:center;padding:8px 10px 6px;border-bottom:1px solid var(--border)}
+.mname{font-size:12px;font-weight:600}
+.mcnt{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+.jlbls{display:grid;grid-template-columns:repeat(7,1fr);padding:4px 6px 2px;gap:1px}
+.jlbl{text-align:center;font-size:8px;font-weight:600;color:var(--hint);text-transform:uppercase}
+.jlbl.we{color:#fca5a5}
+.dgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:2px 6px 8px}
+.dc{border-radius:4px;padding:2px 1px;cursor:pointer;min-height:28px;
+  display:flex;flex-direction:column;align-items:stretch;transition:filter .1s}
+.dc.emp{cursor:default;pointer-events:none}
+.dc:hover:not(.emp){filter:brightness(.93)}
+.dn{font-size:9px;font-weight:500;text-align:center;color:var(--muted);line-height:1.5;padding-top:1px}
+.dc.we{background:#f3f4f6}.dc.we .dn{color:#9ca3af}
+.dc.fer{background:#fff0f0}.dc.fer .dn{color:#dc2626;font-weight:600}
+.dc.nor:hover{background:var(--surface2)}
+.bars{display:flex;flex-direction:column;gap:1px;padding:0 1px;margin-top:1px}
+.bar{height:5px;border-radius:2px;width:100%}
+.bar.cng{opacity:.38}
+.tip{position:fixed;z-index:200;background:var(--text);color:#fff;border-radius:var(--r2);
+  padding:8px 11px;font-size:11px;line-height:1.55;pointer-events:none;max-width:230px;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);display:none}
+.tip-date{font-weight:600;margin-bottom:4px;font-size:12px}
+.tip-row{display:flex;align-items:center;gap:5px;font-size:10px;opacity:.88}
+.tip-dot{width:6px;height:6px;border-radius:1px}
+.tip-muted{font-size:10px;opacity:.5;margin-top:2px}
+.overlay{position:fixed;inset:0;background:rgba(15,20,40,.38);
+  display:flex;align-items:center;justify-content:center;z-index:100;
+  opacity:0;pointer-events:none;transition:opacity .16s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;
+  padding:22px;width:420px;max-width:96vw;transform:translateY(8px);transition:transform .16s;
+  box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.overlay.open .modal{transform:translateY(0)}
+.mttl{font-size:15px;font-weight:600;margin-bottom:3px}
+.msub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.fg{margin-bottom:11px}
+.fg label{display:block;font-size:11px;color:var(--muted);font-weight:500;margin-bottom:5px}
+.fg select,.fg input[type=text],.fg input[type=date]{
+  width:100%;padding:8px 11px;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);
+  font-family:inherit;font-size:13px;outline:none;transition:border .12s}
+.fg select:focus,.fg input:focus{border-color:var(--accent)}
+.rgrp{display:flex;gap:6px}
+.rbt{flex:1;padding:8px;border-radius:var(--r2);border:1px solid var(--border2);
+  background:var(--surface2);color:var(--muted);font-size:12px;
+  cursor:pointer;text-align:center;transition:all .12s;font-weight:500}
+.rbt.on-a{background:#eff6ff;border-color:var(--accent);color:var(--accent)}
+.rbt.on-c{background:#fffbeb;border-color:#d97706;color:#92400e}
+.mbtns2{display:flex;gap:8px;margin-top:16px}
+.mbtns2 .btn{flex:1;justify-content:center}
+.pay-row{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r2);cursor:pointer}
+.pay-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+.pay-row span{font-size:13px;font-weight:500}
+/* RECAP */
+.recap-wrap{padding:20px 24px 40px}
+.recap-filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.recap-filters label{font-size:12px;color:var(--muted);font-weight:500}
+.recap-filters select{padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r2);
+  background:var(--surface);font-family:inherit;font-size:12px;color:var(--text)}
+.recap-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.rscard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;min-width:140px}
+.rscard-lbl{font-size:10px;color:var(--muted);margin-bottom:4px}
+.rscard-val{font-size:18px;font-weight:700;font-family:'DM Mono',monospace}
+.rscard-val.green{color:var(--green)}.rscard-val.orange{color:var(--orange)}
+.recap-month{margin-bottom:24px}
+.recap-month-title{font-size:14px;font-weight:700;margin-bottom:10px;padding:8px 12px;
+  background:var(--accent);color:#fff;border-radius:var(--r2);display:flex;justify-content:space-between;align-items:center}
+.recap-month-title span{font-size:11px;font-weight:400;opacity:.85}
+.recap-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.recap-table th{background:var(--surface2);padding:8px 12px;text-align:left;
+  font-weight:600;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)}
+.recap-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.recap-table tr:last-child td{border-bottom:none}
+.recap-table tr:hover td{background:var(--surface2)}
+.badge-paid{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;
+  font-size:10px;font-weight:600;background:var(--greenl);color:var(--green);border:1px solid var(--greenb)}
+.badge-unpaid{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;
+  font-size:10px;font-weight:600;background:var(--orangel);color:var(--orange);border:1px solid var(--orangeb)}
+.pay-btn{padding:4px 10px;border-radius:var(--r2);border:1px solid var(--greenb);
+  background:var(--greenl);color:var(--green);font-size:10px;font-weight:600;
+  cursor:pointer;font-family:inherit}
+.pay-btn:hover{background:var(--greenb)}
+.pay-btn.unpay{background:var(--orangel);border-color:var(--orangeb);color:var(--orange)}
+.pay-btn.unpay:hover{background:var(--orangeb)}
+
+/* Sync bar */
+.syncbar{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:6px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sync-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#d1d5db;flex-shrink:0;transition:background .3s}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.syncing{background:#f59e0b;animation:pulse .8s infinite}
+.sync-dot.error{background:#dc2626}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sync-btn{padding:4px 10px;border-radius:var(--r2);border:1px solid var(--border2);
+  background:var(--surface2);font-size:11px;cursor:pointer;font-family:inherit;color:var(--text)}
+.sync-btn:hover{background:var(--border)}
+.sync-user{font-size:11px;color:var(--muted);margin-left:auto}
+
+@media print{
+  header,.legbar,.expbar,.stats,.overlay,.tip,.tabs{display:none!important}
+  body{background:#fff}.cal{padding:0}
+  .ygrid{grid-template-columns:repeat(4,1fr);gap:8px}
+  .mcard{break-inside:avoid}
+}
+</style>
+
+<!-- MSAL SDK Microsoft -->
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📡</div>
+    <div><h1>Planning Astreinte SIC 2026</h1><p>Transmission &amp; Informatique</p></div>
+  </div>
+  <div class="hbtns">
+    <button class="btn btn-red" onclick="exportPDF()">&#11015; Export PDF</button>
+    <button class="btn btn-blue" onclick="openNew(null)">+ Ajouter</button>
+  </div>
+</header>
+
+
+<div class="syncbar" id="syncbar">
+  <div class="sync-status">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-label">Non connecté</span>
+  </div>
+  <button class="sync-btn" id="btn-login" onclick="msLogin()">🔑 Connexion Microsoft</button>
+  <button class="sync-btn" id="btn-sync" onclick="manualSync()" style="display:none">↕ Synchroniser</button>
+  <button class="sync-btn" id="btn-logout" onclick="msLogout()" style="display:none">Déconnexion</button>
+  <span class="sync-user" id="sync-user"></span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="tab-planning" onclick="switchTab('planning')">&#128197; Planning</div>
+  <div class="tab" id="tab-recap" onclick="switchTab('recap')">&#128202; Récapitulatif astreintes</div>
+</div>
+
+<div class="tabpanel active" id="panel-planning">
+  <div class="legbar">
+    <span class="legbar-label">Personnes :</span>
+    <div class="leg-list" id="legList"></div>
+    <div class="sep"></div>
+    <div class="leg-list">
+      <div class="leg-item" style="cursor:default"><div class="leg-dot" style="background:#dc2626"></div>Jour férié</div>
+      <div class="leg-item" style="cursor:default"><div class="leg-dot" style="background:#d1d5db"></div>Week-end</div>
+      <div class="leg-item" style="cursor:default"><div class="leg-dot" style="background:#93c5fd;opacity:.5"></div>Congé</div>
+    </div>
+  </div>
+  <div class="expbar">
+    <span class="expbar-label">Mois à exporter :</span>
+    <div class="mbtns" id="mbtns"></div>
+    <span style="font-size:11px;color:var(--hint)">(aucune sélection = export annuel complet)</span>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="cal"><div class="ygrid" id="ygrid"></div></div>
+</div>
+
+<div class="tabpanel" id="panel-recap">
+  <div class="recap-wrap">
+    <div class="recap-filters">
+      <label>Personne :</label>
+      <select id="rf-person" onchange="renderRecap()">
+        <option value="-1">Toutes</option>
+      </select>
+      <label style="margin-left:12px">Statut :</label>
+      <select id="rf-pay" onchange="renderRecap()">
+        <option value="all">Tous</option>
+        <option value="unpaid">Non payées</option>
+        <option value="paid">Payées</option>
+      </select>
+    </div>
+    <div class="recap-summary" id="recap-summary"></div>
+    <div id="recap-content"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="mbox"></div>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const AN = 2026;
+const PS = [
+  {nom:'Michael BOULENGER', ini:'MB', c:'#2563eb'},
+  {nom:'Florian SAROCCHI',  ini:'FS', c:'#16a34a'},
+  {nom:'Floren BARTOLI',    ini:'FB', c:'#ea580c'},
+  {nom:'SIO',               ini:'SI', c:'#7c3aed'},
+  {nom:'Dominique PERELLI', ini:'DP', c:'#db2777'},
+  {nom:'Michael MARCHETTI', ini:'MM', c:'#b45309'},
+];
+const MFR = ['Janvier','Février','Mars','Avril','Mai','Juin',
+             'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const JL = ['L','M','M','J','V','S','D'];
+
+function paques(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,
+        f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),
+        h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,
+        l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+        mo=Math.floor((h+l-7*m+114)/31),j=(h+l-7*m+114)%31+1;
+  return new Date(y,mo-1,j);
+}
+function dk(d){return d.toISOString().slice(0,10);}
+function ad(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+
+const pq = paques(AN);
+const FER = {};
+[
+  [new Date(AN,0,1),"Jour de l'An"],
+  [ad(pq,1),'Lundi de Pâques'],
+  [new Date(AN,4,1),'Fête du Travail'],
+  [new Date(AN,4,8),'Victoire 1945'],
+  [ad(pq,39),'Ascension'],
+  [ad(pq,50),'Lundi de Pentecôte'],
+  [new Date(AN,6,14),'Fête Nationale'],
+  [new Date(AN,7,15),'Assomption'],
+  [new Date(AN,10,1),'Toussaint'],
+  [new Date(AN,10,11),'Armistice 1918'],
+  [new Date(AN,11,25),'Noël']
+].forEach(function(x){FER[dk(x[0])]=x[1];});
+
+function isoWeek(d){
+  const t=new Date(d);t.setHours(0,0,0,0);
+  t.setDate(t.getDate()+4-(t.getDay()||7));
+  const y1=new Date(t.getFullYear(),0,1);
+  return Math.ceil(((t-y1)/86400000+1)/7);
+}
+function mondayOfWeek(w){
+  const j4=new Date(AN,0,4);
+  const sm=new Date(j4);sm.setDate(j4.getDate()-((j4.getDay()||7)-1));
+  const r=new Date(sm);r.setDate(r.getDate()+(w-1)*7);return r;
+}
+const SEMS=[];
+(function(){
+  const seen=new Set();
+  for(let m=0;m<12;m++){
+    const nb=new Date(AN,m+1,0).getDate();
+    for(let d=1;d<=nb;d++){
+      const w=isoWeek(new Date(AN,m,d));
+      if(!seen.has(w)){seen.add(w);SEMS.push(w);}
+    }
+  }
+  SEMS.sort(function(a,b){return a-b;});
+})();
+
+// State
+let entries = JSON.parse(localStorage.getItem('sic26v4') || '[]');
+if(!entries.length){
+  const old = localStorage.getItem('sic26v3');
+  if(old) entries = JSON.parse(old).map(function(e){return Object.assign({},e,{paid:false,paidDate:''});});
+}
+let hidden = new Set();
+let selMonths = new Set();
+let editId = null;
+let curType = 'a';
+const TIPS = {};
+
+function save(){localStorage.setItem('sic26v4', JSON.stringify(entries));}
+
+function dayMap(){
+  const m={};
+  entries.forEach(function(e){
+    if(hidden.has(e.pi)) return;
+    const s=new Date(e.dd), en=new Date(e.df);
+    for(let d=new Date(s);d<=en;d.setDate(d.getDate()+1)){
+      const k=dk(d);
+      if(!m[k]) m[k]=[];
+      m[k].push(e);
+    }
+  });
+  return m;
+}
+
+// Tabs
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tabpanel').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='recap') renderRecap();
+}
+
+// Légende
+function renderLeg(){
+  document.getElementById('legList').innerHTML = PS.map(function(p,i){
+    return '<div class="leg-item '+(hidden.has(i)?'off':'')+'" onclick="toggleP('+i+')">'
+      +'<div class="leg-dot" style="background:'+p.c+'"></div>'+p.nom+'</div>';
+  }).join('');
+}
+function toggleP(i){
+  if(hidden.has(i)) hidden.delete(i); else hidden.add(i);
+  renderAll();
+}
+
+// Mois
+function renderMbtns(){
+  document.getElementById('mbtns').innerHTML = MFR.map(function(m,i){
+    return '<div class="mbtn '+(selMonths.has(i)?'on':'')+'" onclick="toggleM('+i+')">'+m.slice(0,3)+'</div>';
+  }).join('');
+}
+function toggleM(i){
+  if(selMonths.has(i)) selMonths.delete(i); else selMonths.add(i);
+  renderMbtns();
+}
+
+// Stats
+function renderStats(){
+  const astr = entries.filter(function(e){return e.t==='a';});
+  const sems = new Set(astr.map(function(e){return e.sem;})).size;
+  const paid = astr.filter(function(e){return e.paid;}).length;
+  let h = '<div class="scard"><div class="slbl">Semaines planifiées</div>'
+    +'<div class="sval">'+sems+'<span style="font-size:12px;color:var(--hint)"> / '+SEMS.length+'</span></div>'
+    +'<div class="ssub">sur l'année 2026</div></div>';
+  h += '<div class="scard"><div class="slbl">Astreintes payées</div>'
+    +'<div class="sval" style="color:var(--green)">'+paid+'</div>'
+    +'<div class="ssub">sur '+astr.length+' planifiées</div></div>';
+  PS.forEach(function(p,i){
+    const n = astr.filter(function(e){return e.pi===i;}).length;
+    const np = astr.filter(function(e){return e.pi===i && e.paid;}).length;
+    h += '<div class="scard"><div class="slbl"><div class="sdot" style="background:'+p.c+'"></div>'+p.nom.split(' ')[0]+'</div>'
+      +'<div class="sval" style="color:'+p.c+'">'+n+'</div>'
+      +'<div class="ssub">'+np+' payée(s)</div></div>';
+  });
+  document.getElementById('stats').innerHTML = h;
+}
+
+// Calendrier
+function renderCal(){
+  const dm = dayMap();
+  Object.keys(TIPS).forEach(function(k){delete TIPS[k];});
+  let h = '';
+  for(let mi=0;mi<12;mi++){
+    const nb = new Date(AN,mi+1,0).getDate();
+    const sw = (new Date(AN,mi,1).getDay()+6)%7;
+    const astrMois = entries.filter(function(e){return e.t==='a' && new Date(e.dd).getMonth()===mi;});
+    const semsMois = new Set(astrMois.map(function(e){return e.sem;})).size;
+    let days = '';
+    for(let i=0;i<sw;i++) days += '<div class="dc emp"></div>';
+    for(let d=1;d<=nb;d++){
+      const dt = new Date(AN,mi,d);
+      const wd = (dt.getDay()+6)%7;
+      const k = dk(dt);
+      const ferie = FER[k];
+      const we = wd>=5;
+      const data = dm[k]||[];
+      const astrs = data.filter(function(e){return e.t==='a';});
+      const congs = data.filter(function(e){return e.t==='c';});
+      const tipLines = [];
+      tipLines.push({type:'date', txt:dt.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})});
+      if(ferie) tipLines.push({type:'ferie', txt:ferie});
+      astrs.forEach(function(e){tipLines.push({type:'p',c:PS[e.pi].c,txt:'Astreinte S'+e.sem+' : '+PS[e.pi].nom+(e.paid?' ✓':' ⏳')});});
+      congs.forEach(function(e){tipLines.push({type:'p',c:PS[e.pi].c,txt:'Congé : '+PS[e.pi].nom,cng:true});});
+      if(!ferie&&!astrs.length&&!congs.length) tipLines.push({type:'hint',txt:'Cliquer pour planifier'});
+      TIPS[k] = tipLines;
+      let cls = 'dc';
+      if(ferie) cls+=' fer'; else if(we) cls+=' we'; else cls+=' nor';
+      const firstId = astrs.length ? astrs[0].id : (congs.length ? congs[0].id : null);
+      const clickAttr = firstId!==null ? 'data-edit="'+firstId+'"' : 'data-new="'+k+'"';
+      let bars = '';
+      if(astrs.length||congs.length){
+        bars = '<div class="bars">';
+        astrs.forEach(function(e){
+          bars += '<div class="bar" style="background:'+PS[e.pi].c+(e.paid?';box-shadow:0 0 0 1.5px #16a34a':'')+';"></div>';
+        });
+        congs.forEach(function(e){
+          bars += '<div class="bar cng" style="background:'+PS[e.pi].c+';"></div>';
+        });
+        bars += '</div>';
+      }
+      days += '<div class="'+cls+'" data-tip="'+k+'" '+clickAttr+'><div class="dn">'+d+'</div>'+bars+'</div>';
+    }
+    h += '<div class="mcard" id="mc'+mi+'">'
+      +'<div class="mhdr"><span class="mname">'+MFR[mi]+'</span><span class="mcnt">'+semsMois+' astr.</span></div>'
+      +'<div class="jlbls">'+JL.map(function(j,i){return '<div class="jlbl '+(i>=5?'we':'')+'">'+j+'</div>';}).join('')+'</div>'
+      +'<div class="dgrid">'+days+'</div>'
+      +'</div>';
+  }
+  document.getElementById('ygrid').innerHTML = h;
+  document.querySelectorAll('.dc:not(.emp)').forEach(function(el){
+    const tipKey = el.dataset.tip;
+    el.addEventListener('mouseenter', function(ev){showTip(ev,tipKey);});
+    el.addEventListener('mousemove',  function(ev){moveTip(ev);});
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('click', function(){
+      if(el.dataset.edit) openEdit(parseInt(el.dataset.edit));
+      else if(el.dataset.new) openNew(el.dataset.new);
+    });
+  });
+}
+
+// Tooltip
+const tipEl = document.getElementById('tip');
+function showTip(ev,k){
+  const lines = TIPS[k]; if(!lines) return;
+  let h='';
+  lines.forEach(function(l){
+    if(l.type==='date') h+='<div class="tip-date">'+l.txt+'</div>';
+    else if(l.type==='ferie') h+='<div class="tip-row"><div class="tip-dot" style="background:#dc2626"></div>'+l.txt+'</div>';
+    else if(l.type==='p') h+='<div class="tip-row"><div class="tip-dot" style="background:'+l.c+';opacity:'+(l.cng?.4:1)+'"></div>'+l.txt+'</div>';
+    else h+='<div class="tip-muted">'+l.txt+'</div>';
+  });
+  tipEl.innerHTML=h; tipEl.style.display='block'; moveTip(ev);
+}
+function moveTip(ev){
+  let x=ev.clientX+14, y=ev.clientY+14;
+  if(x+240>window.innerWidth) x=ev.clientX-250;
+  if(y+120>window.innerHeight) y=ev.clientY-130;
+  tipEl.style.left=x+'px'; tipEl.style.top=y+'px';
+}
+function hideTip(){tipEl.style.display='none';}
+
+// Modal
+function openNew(k){
+  editId=null; curType='a';
+  const w = k ? isoWeek(new Date(k)) : SEMS[0];
+  const mon = mondayOfWeek(w);
+  buildModal({dd: k||dk(mon), df: k||dk(ad(mon,6)), sem:w, pi:0, notes:'', paid:false, paidDate:''});
+}
+function openEdit(id){
+  const e = entries.find(function(x){return x.id===id;});
+  if(!e) return;
+  editId=id; curType=e.t; buildModal(e);
+}
+
+function buildModal(e){
+  const ia = curType==='a';
+  let pOpts='', sOpts='';
+  PS.forEach(function(p,i){
+    pOpts += '<option value="'+i+'"'+(e.pi===i?' selected':'')+'>'+p.nom+'</option>';
+  });
+  SEMS.forEach(function(w){
+    const l=mondayOfWeek(w), di=ad(l,6);
+    const fmt=function(d){return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});};
+    sOpts += '<option value="'+w+'"'+(e.sem===w?' selected':'')+'>S'+w+' — du '+fmt(l)+' au '+fmt(di)+'</option>';
+  });
+  const isPaid = e.paid || false;
+  const paidDate = e.paidDate || '';
+  const notesVal = (e.notes||'').replace(/"/g,'&quot;');
+
+  let html = '<div class="mttl">'+(editId!==null?'Modifier':'Nouvelle entrée')+'</div>';
+  html += '<div class="msub">'+(editId!==null?'Modifier les informations':'Planifier une astreinte ou un congé')+'</div>';
+  html += '<div class="fg"><label>Type</label><div class="rgrp">';
+  html += '<div class="rbt '+(ia?'on-a':'')+'" id="bt-a" onclick="selT('a')">Astreinte (1 semaine)</div>';
+  html += '<div class="rbt '+(!ia?'on-c':'')+'" id="bt-c" onclick="selT('c')">Congé</div>';
+  html += '</div></div>';
+  html += '<div class="fg"><label>Personne</label><select id="fp">'+pOpts+'</select></div>';
+  html += '<div id="sg" style="'+(ia?'':'display:none')+'">';
+  html += '<div class="fg"><label>Semaine — affichage auto de la semaine entière</label><select id="fs">'+sOpts+'</select></div></div>';
+  html += '<div id="dg" style="'+(ia?'display:none':'')+'">';
+  html += '<div class="fg"><label>Date début</label><input type="date" id="fdd" value="'+(e.dd||'')+'" min="2026-01-01" max="2026-12-31"></div>';
+  html += '<div class="fg"><label>Date fin</label><input type="date" id="fdf" value="'+(e.df||'')+'" min="2026-01-01" max="2026-12-31"></div></div>';
+  html += '<div id="pay-sec" style="'+(ia?'':'display:none')+'">';
+  html += '<div class="fg"><label>Paiement</label>';
+  html += '<label class="pay-row"><input type="checkbox" id="fpaid" '+(isPaid?'checked':'')+' onchange="onPaidChange()">';
+  html += '<span id="pay-lbl">'+(isPaid?'✅ Astreinte payée':'⏳ En attente de paiement')+'</span></label>';
+  html += '<div id="pay-date-row" style="'+(isPaid?'':'display:none')+'" class="fg" style="margin-top:6px">';
+  html += '<label>Date de paiement</label><input type="date" id="fpaiddate" value="'+paidDate+'"></div>';
+  html += '</div></div>';
+  html += '<div class="fg"><label>Notes (facultatif)</label><input type="text" id="fn" value="'+notesVal+'" placeholder="ex : permanence téléphonique…"></div>';
+  html += '<div class="mbtns2"><button class="btn" onclick="closeM()">Annuler</button>';
+  if(editId!==null) html += '<button class="btn btn-danger" onclick="delE()">Supprimer</button>';
+  html += '<button class="btn btn-blue" onclick="saveE()">Enregistrer</button></div>';
+
+  document.getElementById('mbox').innerHTML = html;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function onPaidChange(){
+  const cb = document.getElementById('fpaid');
+  const row = document.getElementById('pay-date-row');
+  const lbl = document.getElementById('pay-lbl');
+  row.style.display = cb.checked ? '' : 'none';
+  lbl.textContent = cb.checked ? '✅ Astreinte payée' : '⏳ En attente de paiement';
+  if(cb.checked && !document.getElementById('fpaiddate').value){
+    document.getElementById('fpaiddate').value = new Date().toISOString().slice(0,10);
+  }
+}
+
+function selT(t){
+  curType=t; const ia=t==='a';
+  document.getElementById('bt-a').className='rbt '+(ia?'on-a':'');
+  document.getElementById('bt-c').className='rbt '+(ia?'':'on-c');
+  document.getElementById('sg').style.display=ia?'':'none';
+  document.getElementById('dg').style.display=ia?'none':'';
+  document.getElementById('pay-sec').style.display=ia?'':'none';
+}
+
+function closeM(){document.getElementById('overlay').classList.remove('open');}
+function overlayClick(ev){if(ev.target===document.getElementById('overlay')) closeM();}
+
+function saveE(){
+  const pi = parseInt(document.getElementById('fp').value);
+  const notes = document.getElementById('fn').value.trim();
+  const paidEl = document.getElementById('fpaid');
+  const paid = paidEl ? paidEl.checked : false;
+  const pdEl = document.getElementById('fpaiddate');
+  const paidDate = (paid && pdEl) ? pdEl.value : '';
+  let dd,df,sem;
+  if(curType==='a'){
+    sem = parseInt(document.getElementById('fs').value);
+    const l = mondayOfWeek(sem);
+    dd=dk(l); df=dk(ad(l,6));
+  } else {
+    dd = document.getElementById('fdd').value;
+    df = document.getElementById('fdf').value;
+    if(!dd||!df||df<dd){alert('Vérifiez les dates (fin doit être après début).');return;}
+    sem = undefined;
+  }
+  if(editId!==null){
+    const idx = entries.findIndex(function(e){return e.id===editId;});
+    if(idx>=0) entries[idx] = {id:editId,t:curType,pi:pi,dd:dd,df:df,sem:sem,notes:notes,paid:paid,paidDate:paidDate};
+  } else {
+    entries.push({id:Date.now(),t:curType,pi:pi,dd:dd,df:df,sem:sem,notes:notes,paid:paid,paidDate:paidDate});
+  }
+  save(); closeM(); renderAll();
+}
+
+function delE(){
+  if(!confirm('Supprimer cette entrée ?')) return;
+  entries = entries.filter(function(e){return e.id!==editId;});
+  save(); closeM(); renderAll();
+}
+
+// RECAP
+function initRecapFilter(){
+  const sel = document.getElementById('rf-person');
+  if(sel.options.length===1){
+    PS.forEach(function(p,i){
+      const o=document.createElement('option');
+      o.value=i; o.textContent=p.nom; sel.appendChild(o);
+    });
+  }
+}
+
+function togglePaid(id){
+  const idx = entries.findIndex(function(e){return e.id===id;});
+  if(idx<0) return;
+  if(!entries[idx].paid){
+    const d = prompt('Date de paiement (AAAA-MM-JJ) :', new Date().toISOString().slice(0,10));
+    if(d===null) return;
+    entries[idx].paid=true; entries[idx].paidDate=d;
+  } else {
+    if(!confirm('Annuler le paiement ?')) return;
+    entries[idx].paid=false; entries[idx].paidDate='';
+  }
+  save(); renderAll(); renderRecap();
+}
+
+function renderRecap(){
+  initRecapFilter();
+  const pf = parseInt(document.getElementById('rf-person').value);
+  const sf = document.getElementById('rf-pay').value;
+  const astr = entries.filter(function(e){return e.t==='a';});
+  const filtered = astr.filter(function(e){return pf===-1 || e.pi===pf;});
+  const total=filtered.length, paid=filtered.filter(function(e){return e.paid;}).length;
+
+  document.getElementById('recap-summary').innerHTML =
+    '<div class="rscard"><div class="rscard-lbl">Total astreintes</div><div class="rscard-val">'+total+'</div></div>'
+    +'<div class="rscard"><div class="rscard-lbl">✅ Payées</div><div class="rscard-val green">'+paid+'</div></div>'
+    +'<div class="rscard"><div class="rscard-lbl">⏳ En attente</div><div class="rscard-val orange">'+(total-paid)+'</div></div>';
+
+  let html='';
+  for(let mi=0;mi<12;mi++){
+    const mAll = filtered.filter(function(e){
+      return new Date(e.dd).getMonth()===mi || new Date(e.df).getMonth()===mi;
+    });
+    const mShow = sf==='all' ? mAll : sf==='paid' ? mAll.filter(function(e){return e.paid;}) : mAll.filter(function(e){return !e.paid;});
+    if(!mShow.length) continue;
+    const mPaid = mAll.filter(function(e){return e.paid;}).length;
+    html += '<div class="recap-month">'
+      +'<div class="recap-month-title">'+MFR[mi]+' 2026<span>'+mPaid+'/'+mAll.length+' payée(s)</span></div>'
+      +'<table class="recap-table"><thead><tr>'
+      +'<th>Semaine</th><th>Période</th><th>Personne</th><th>Notes</th><th>Statut</th><th>Date paiement</th><th>Action</th>'
+      +'</tr></thead><tbody>';
+    mShow.sort(function(a,b){return a.dd.localeCompare(b.dd);}).forEach(function(e){
+      const p=PS[e.pi];
+      const fmt=function(d){return new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});};
+      const badge=e.paid?'<span class="badge-paid">✅ Payée</span>':'<span class="badge-unpaid">⏳ En attente</span>';
+      const btn=e.paid
+        ?'<button class="pay-btn unpay" onclick="togglePaid('+e.id+')">Annuler</button>'
+        :'<button class="pay-btn" onclick="togglePaid('+e.id+')">✓ Marquer payée</button>';
+      html+='<tr><td><strong>S'+(e.sem||'')+'</strong></td>'
+        +'<td>'+fmt(e.dd)+' → '+fmt(e.df)+'</td>'
+        +'<td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+p.c+';margin-right:5px"></span>'+p.nom+'</td>'
+        +'<td style="color:var(--muted)">'+(e.notes||'—')+'</td>'
+        +'<td>'+badge+'</td>'
+        +'<td style="font-family:'DM Mono',monospace;font-size:11px">'+(e.paidDate||'—')+'</td>'
+        +'<td>'+btn+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  if(!html) html='<p style="color:var(--muted);padding:20px">Aucune astreinte avec ces filtres.</p>';
+  document.getElementById('recap-content').innerHTML=html;
+}
+
+// Export PDF
+async function exportPDF(){
+  const {jsPDF}=window.jspdf;
+  const moisList=selMonths.size>0?[...selMonths].sort(function(a,b){return a-b;}):[...Array(12).keys()];
+  const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const W=297,H=210;
+  for(let i=0;i<moisList.length;i++){
+    const mi=moisList[i]; if(i>0) pdf.addPage();
+    const card=document.getElementById('mc'+mi); if(!card) continue;
+    pdf.setFillColor(37,99,235);pdf.rect(0,0,W,16,'F');
+    pdf.setTextColor(255,255,255);pdf.setFontSize(13);pdf.setFont('helvetica','bold');
+    pdf.text('Planning Astreinte SIC — '+MFR[mi]+' '+AN,10,11);
+    pdf.setFontSize(8);pdf.setFont('helvetica','normal');
+    pdf.text('Transmission & Informatique',W-10,11,{align:'right'});
+    let lx=10,ly=24;
+    const cRGB={'#2563eb':[37,99,235],'#16a34a':[22,163,74],'#ea580c':[234,88,12],
+                '#7c3aed':[124,58,237],'#db2777':[219,39,119],'#b45309':[180,83,9]};
+    pdf.setFontSize(8);
+    PS.forEach(function(p,idx){
+      if(hidden.has(idx)) return;
+      const rgb=cRGB[p.c]||[100,100,100];
+      pdf.setFillColor(rgb[0],rgb[1],rgb[2]);pdf.rect(lx,ly-3,4,4,'F');
+      pdf.setTextColor(26,32,53);pdf.text(p.nom,lx+6,ly);
+      lx+=48;if(lx>260){lx=10;ly+=7;}
+    });
+    const canvas=await html2canvas(card,{scale:2,useCORS:true,logging:false,backgroundColor:'#ffffff'});
+    const img=canvas.toDataURL('image/png');
+    const ratio=canvas.width/canvas.height;
+    const maxW=W-20,maxH=H-38;
+    let fw=maxW,fh=fw/ratio;if(fh>maxH){fh=maxH;fw=fh*ratio;}
+    pdf.addImage(img,'PNG',(W-fw)/2,32,fw,fh);
+    pdf.setFontSize(7);pdf.setTextColor(160,172,192);
+    pdf.text('Généré le '+new Date().toLocaleDateString('fr-FR')+' — Planning SIC '+AN,W/2,H-3,{align:'center'});
+  }
+  const lbl=selMonths.size===0?'Annuel_'+AN:moisList.map(function(m){return MFR[m].slice(0,3);}).join('-');
+  pdf.save('Planning_SIC_'+lbl+'.pdf');
+}
+
+function renderAll(){renderLeg();renderStats();renderMbtns();renderCal();}
+
+
+// ══════════════════════════════════════════════
+// SYNC ONEDRIVE — MSAL Browser v2/v3 compatible
+// ══════════════════════════════════════════════
+const MSAL_CONFIG = {
+  auth: {
+    clientId: '1c24df42-5127-4df6-8edd-b8b6c9668550',
+    authority: 'https://login.microsoftonline.com/sis2bcorsica.onmicrosoft.com',
+    redirectUri: window.location.origin + window.location.pathname.split('?')[0]
+  },
+  cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
+};
+const SCOPES = ['Files.ReadWrite', 'User.Read', 'offline_access'];
+const ONEDRIVE_FILE = '/me/drive/root:/SIC2026_Planning/sic2026.json:/content';
+let msalApp = null;
+let msAccount = null;
+let autoSyncTimer = null;
+
+function setSyncStatus(state, text){
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if(dot) dot.className = 'sync-dot ' + state;
+  if(lbl) lbl.textContent = text;
+}
+
+async function initMSAL(){
+  try {
+    if(typeof msal === 'undefined'){
+      setSyncStatus('error','SDK MSAL non chargé — vérifiez la connexion internet');
+      return;
+    }
+    msalApp = new msal.PublicClientApplication(MSAL_CONFIG);
+    // MSAL v3 nécessite initialize()
+    if(typeof msalApp.initialize === 'function'){
+      await msalApp.initialize();
+    }
+    // Gérer le retour de redirect
+    const resp = await msalApp.handleRedirectPromise();
+    if(resp && resp.account){
+      msAccount = resp.account;
+      onLoggedIn();
+      return;
+    }
+    // Vérifier session existante
+    const accounts = msalApp.getAllAccounts();
+    if(accounts.length > 0){
+      msAccount = accounts[0];
+      onLoggedIn();
+    }
+  } catch(e){
+    setSyncStatus('error','Erreur init MSAL : ' + e.message);
+    console.error('MSAL init error:', e);
+  }
+}
+
+function onLoggedIn(){
+  document.getElementById('btn-login').style.display = 'none';
+  document.getElementById('btn-sync').style.display = '';
+  document.getElementById('btn-logout').style.display = '';
+  const userEl = document.getElementById('sync-user');
+  if(userEl) userEl.textContent = msAccount.name || msAccount.username;
+  setSyncStatus('syncing', 'Chargement...');
+  loadFromOneDrive();
+  autoSyncTimer = setInterval(autoSync, 60000);
+}
+
+function msLogin(){
+  if(!msalApp){
+    setSyncStatus('error','MSAL non initialisé');
+    return;
+  }
+  setSyncStatus('syncing','Redirection vers Microsoft...');
+  msalApp.loginRedirect({ scopes: SCOPES }).catch(function(e){
+    setSyncStatus('error','Erreur : ' + e.message);
+    console.error('loginRedirect error:', e);
+  });
+}
+
+function msLogout(){
+  if(msalApp && msAccount){
+    clearInterval(autoSyncTimer);
+    msalApp.logoutRedirect({ account: msAccount }).catch(console.error);
+  } else {
+    msAccount = null;
+    document.getElementById('btn-login').style.display = '';
+    document.getElementById('btn-sync').style.display = 'none';
+    document.getElementById('btn-logout').style.display = 'none';
+    document.getElementById('sync-user').textContent = '';
+    setSyncStatus('', 'Non connecté');
+  }
+}
+
+async function getToken(){
+  if(!msalApp || !msAccount) return null;
+  const req = { scopes: SCOPES, account: msAccount };
+  try {
+    const resp = await msalApp.acquireTokenSilent(req);
+    return resp.accessToken;
+  } catch(e){
+    console.warn('Silent token failed, redirect:', e.message);
+    msalApp.acquireTokenRedirect(req).catch(console.error);
+    return null;
+  }
+}
+
+async function loadFromOneDrive(){
+  try {
+    const token = await getToken();
+    if(!token) return;
+    setSyncStatus('syncing', 'Synchronisation...');
+    const resp = await fetch('https://graph.microsoft.com/v1.0' + ONEDRIVE_FILE, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if(resp.status === 404){
+      await saveToOneDrive();
+      setSyncStatus('ok', 'Fichier créé · ' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
+      return;
+    }
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const remote = await resp.json();
+    const localMap = {};
+    entries.forEach(function(e){ localMap[e.id] = e; });
+    remote.forEach(function(e){
+      if(!localMap[e.id] || (e.updatedAt||0) > (localMap[e.id].updatedAt||0)){
+        localMap[e.id] = e;
+      }
+    });
+    entries = Object.values(localMap);
+    localStorage.setItem('sic26v4', JSON.stringify(entries));
+    renderAll();
+    setSyncStatus('ok', 'Synchronisé · ' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
+  } catch(e){
+    setSyncStatus('error','Erreur sync : ' + e.message);
+    console.error('loadFromOneDrive error:', e);
+  }
+}
+
+async function saveToOneDrive(){
+  if(!msAccount) return;
+  try {
+    const token = await getToken();
+    if(!token) return;
+    const resp = await fetch('https://graph.microsoft.com/v1.0' + ONEDRIVE_FILE, {
+      method: 'PUT',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(entries)
+    });
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    setSyncStatus('ok', 'Sauvegardé · ' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
+  } catch(e){
+    setSyncStatus('error','Erreur sauvegarde : ' + e.message);
+    console.error('saveToOneDrive error:', e);
+  }
+}
+
+function autoSync(){ if(msAccount) loadFromOneDrive(); }
+function manualSync(){ setSyncStatus('syncing','Synchronisation...'); loadFromOneDrive(); }
+
+// Surcharge save() pour déclencher sync OneDrive
+function save(){
+  localStorage.setItem('sic26v4', JSON.stringify(entries));
+  if(msAccount) saveToOneDrive();
+}
+
+initMSAL();
+renderAll();
+</script>
+</body>
+</html>
